@@ -1,0 +1,30 @@
+[2023-12-11 14:35:53 +0800] [733416] [INFO] Starting gunicorn 21.2.0
+[2023-12-11 14:35:53 +0800] [733416] [INFO] Listening at: http://0.0.0.0:8080 (733416)
+[2023-12-11 14:35:53 +0800] [733416] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2023-12-11 14:35:53 +0800] [733473] [INFO] Booting worker with pid: 733473
+[2023-12-11 14:35:53 +0800] [733473] [INFO] Started server process [733473]
+[2023-12-11 14:35:53 +0800] [733473] [INFO] Waiting for application startup.
+[2023-12-11 14:35:53 +0800] [733473] [INFO] Application startup complete.
+[2023-12-11 14:35:53 +0800] [733474] [INFO] Booting worker with pid: 733474
+[2023-12-11 14:35:53 +0800] [733475] [INFO] Booting worker with pid: 733475
+[2023-12-11 14:35:53 +0800] [733474] [INFO] Started server process [733474]
+[2023-12-11 14:35:53 +0800] [733474] [INFO] Waiting for application startup.
+[2023-12-11 14:35:53 +0800] [733474] [INFO] Application startup complete.
+[2023-12-11 14:35:53 +0800] [733475] [INFO] Started server process [733475]
+[2023-12-11 14:35:53 +0800] [733475] [INFO] Waiting for application startup.
+[2023-12-11 14:35:53 +0800] [733475] [INFO] Application startup complete.
+[2023-12-11 14:35:53 +0800] [733476] [INFO] Booting worker with pid: 733476
+[2023-12-11 14:35:53 +0800] [733476] [INFO] Started server process [733476]
+[2023-12-11 14:35:53 +0800] [733476] [INFO] Waiting for application startup.
+[2023-12-11 14:35:53 +0800] [733476] [INFO] Application startup complete.
+Process 733476 is entering the critical section. (PID: 733476)
+weight list update!
+weight_id : 0 is created.
+Process 733476 is leaving the critical section. (PID: 733476)
+best.pt
+config.yaml
+logger.log
+Process 733476 is entering the critical section. (PID: 733476)
+weight list update!
+weight list updated!
+Process 733476 is leaving the critical section. (PID: 733476)

@@ -1,0 +1,52 @@
+exp_name: test
+train_root: ./datas/train.csv
+val_root: ./datas/val.csv
+image_root: ''
+randomsampler: false
+randomsampler_num: 200
+model_name: swin-b
+use_pretrained_backbone: true
+pretrained: ~
+data_size: 384
+num_workers: 12
+batch_size: 20
+max_epochs: 2
+optimizer: SGD
+max_lr: 0.0005
+wdecay: 0.0003
+warmup_batchs: 1500
+use_amp: true
+use_fpn: true
+fpn_size: 1536
+use_selection: true
+num_classes: 12
+num_selects:
+  layer1: 256
+  layer2: 128
+  layer3: 64
+  layer4: 32
+use_combiner: true
+lambda_b0: 1.375
+lambda_b: 0.3
+lambda_s: 0.0
+lambda_n: 5.0
+lambda_c: 1.0
+update_freq: 4
+log_freq: 100
+eval_freq: 10
+temperature: 64
+target_name:
+- '1'
+- '10'
+- '16'
+- '17'
+- '2'
+- '20'
+- '4'
+- '5'
+- '6'
+- '7'
+- '8'
+- '9'
+best_cls: combiner
+eval_model: ~
