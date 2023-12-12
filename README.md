@@ -4,40 +4,32 @@
 ### 4. 照著資料夾內的README操作即可
 
 ## File Structure
-HERBS_API_project-root   
-│  
-├── inference_herbs_api  
-│   ├── code  
-│   │   ├── some python files  
-│   │   ├── some logs  
-│   │   └── ...  
-│   │  
-│   ├── Dockerfile  
-│   │  
-│   ├── README.md  
-│   │  
-│   └── requirements.txt  
-│
-├── train_herbs_api  
-│   ├── code  
-│   │   ├── some python files  
-│   │   ├── some logs  
-│   │   └── ...  
-│   │  
-│   ├── Dockerfile  
-│   │  
-│   ├── README.md  
-│   │  
-│   └── requirements.txt  
-│  
-└── README.md  
-
-.  
-├── ...  
-├── docs                    # Documentation files (alternatively `doc`)  
-│   ├── TOC.md              # Table of contents  
-│   ├── faq.md              # Frequently asked questions  
-│   ├── misc.md             # Miscellaneous information  
-│   ├── usage.md            # Getting started guide  
-│   └── ...                 # etc.  
-└── ...  
+　　　　HERBS_API_project-root   
+　　　　│  
+　　　　├── inference_herbs_api  
+　　　　│   ├── code  
+　　　　│   │   ├── some python files  
+　　　　│   │   ├── some logs  
+　　　　│   │   └── ...  
+　　　　│   │  
+　　　　│   ├── Dockerfile  
+　　　　│   │  
+　　　　│   ├── README.md  
+　　　　│   │  
+　　　　│   └── requirements.txt  
+　　　　│　　
+　　　　│　　
+　　　　├── train_herbs_api  
+　　　　│   ├── code  
+　　　　│   │   ├── some python files  
+　　　　│   │   ├── some logs  
+　　　　│   │   └── ...  
+　　　　│   │  
+　　　　│   ├── Dockerfile  
+　　　　│   │  
+　　　　│   ├── README.md  
+　　　　│   │  
+　　　　│   └── requirements.txt  
+　　　　│ 
+　　　　│　　 
+　　　　└── README.md  
