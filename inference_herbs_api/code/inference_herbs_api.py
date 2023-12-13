@@ -171,18 +171,18 @@ def _get_weight_index(weight_id):
     else:
         return w_idx, weight_list[w_idx]
 
-@app.on_event("startup")
-async def startup_event():
+# @app.on_event("startup")
+# async def startup_event():
 
-    # log_format
-    logger = logging.getLogger("uvicorn.access")
-    console_formatter = uvicorn.logging.ColourizedFormatter(
-        "(Time) : {asctime} - (Pid) : {process} - (IP-Response) : {message}",
-        style="{", use_colors=True)
-    logger.handlers[0].setFormatter(console_formatter)
+#     # log_format
+#     logger = logging.getLogger("uvicorn.access")
+#     console_formatter = uvicorn.logging.ColourizedFormatter(
+#         "(Time) : {asctime} - (Pid) : {process} - (IP-Response) : {message}",
+#         style="{", use_colors=True)
+#     logger.handlers[0].setFormatter(console_formatter)
 
-    if not os.path.exists(weight_dir):
-        os.mkdir(weight_dir)
+#     if not os.path.exists(weight_dir):
+#         os.mkdir(weight_dir)
 
 
 @app.get("/weight/")

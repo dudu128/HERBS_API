@@ -23,6 +23,7 @@
     │   ├── code  
     │   │   ├── some python files  
     │   │   ├── some logs  
+    │   │   ├── pretrained  
     │   │   └── ...  
     │   │  
     │   ├── Dockerfile  
