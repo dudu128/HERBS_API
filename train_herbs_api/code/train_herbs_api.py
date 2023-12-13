@@ -91,6 +91,7 @@ def _get_weight_index(weight_id):
 def _get_job_index(job_id):
     job_list = _get_job_list()
     j_idx = next((i for i in range(len(job_list)) if job_list[i]['job_id'] == job_id), None)
+    print(j_idx)
     if j_idx is None:
         return j_idx, None
     else:
@@ -165,7 +166,8 @@ async def post_weight(response: Response, weight: UploadFile, name: str, info: U
     Returns:
         list: [int: weight_id, int: error_code]
     """
-
+    if not os.path.exists(weight_dir):
+        os.mkdir(weight_dir)
     weight_list_id, w = _critical_section_weight_id()
     w["name"] = name
     w["info"] = info
@@ -277,7 +279,7 @@ async def post_train(response: Response,
             weight_idx, weight_list = _get_weight_index(weight_id)
             if weight_idx is None:
                 response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-                return {"error_code": 2, "error_msg": "weight {weight_id} is not exist"}
+                return {"error_code": 2, "error_msg": "weight {weight_id} is not exist."}
             
         print("step 1. Weight management passed")
 
@@ -441,14 +443,12 @@ async def delete_train(response: Response, job_id: int):
     # kill the process
     j_idx, j = _get_job_index(job_id)
     if j_idx is None:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error_code": 1, "error_msg": "job {job_id} is not exists."}
     elif j["type"] != "train":
         return {"error_code": 2, "error_msg": "job {job_id} is not a training task."}
     else:
         if j["status"] == "Finished":
-            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return {"error_code": 2, "error_msg": "job {job_id} is finished."}
+            return {"error_code": 3, "error_msg": "job {job_id} is finished."}
         # stop the watch_dog process
         os.killpg(os.getpgid(j["pid"]), signal.SIGTERM)
         # delete the dataset
@@ -581,7 +581,7 @@ async def post_test(response: Response,
         job_idx, job_list = _get_job_index(job_id)
 
         if job_idx is None:
-            return {"error_code": 1, "error_msg": "Weight {weight_id} is not exists."}
+            return {"error_code": 2, "error_msg": "job {job_id} is not exists."}
 
         print("step 1. Job managemet passed")
         
@@ -597,7 +597,7 @@ async def post_test(response: Response,
         if not zipfile.is_zipfile(data_zip_path):
             os.remove(data_zip_path)
             response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return {"error_code": 2, "error_msg": "Upload file is not a zip file."}
+            return {"error_code": 3, "error_msg": "Upload file is not a zip file."}
         
         # Extract files
         with zipfile.ZipFile(data_zip_path, mode='r') as zip_file:
@@ -713,7 +713,7 @@ async def get_test(response: Response, background_tasks: BackgroundTasks, testjo
         return FileResponse(zip_path)
 
 
-@app.delete("/test/{job_id}")
+@app.delete("/test/{testjob_id}")
 async def delete_test(response: Response, testjob_id: int):
     """ Delete the testing task of job_id
 
@@ -731,15 +731,12 @@ async def delete_test(response: Response, testjob_id: int):
     print(tj["job_id"])
     j_idx, j = _get_job_index(tj["job_id"])
     if tj_idx is None:
-        return {"error_code": 1, "error_msg": "Job {job_id} is not exists."}
+        return {"error_code": 1, "error_msg": "Testjob {testjob_id} is not exists."}
     else:
-        if j["type"] != "test":
-            return {"error_code": 2, "error_msg": "Job {job_id} is not for testing."}
-        else:
-            del testjob_list[tj_idx]
-            _update_testjob_list(testjob_list)
-            shutil.rmtree(os.path.join(testjob_dir, str(testjob_id)))
-            return {"error_code": 0}
+        del testjob_list[tj_idx]
+        _update_testjob_list(testjob_list)
+        shutil.rmtree(os.path.join(testjob_dir, str(testjob_id)))
+        return {"error_code": 0}
 
 test_url_data = []
 

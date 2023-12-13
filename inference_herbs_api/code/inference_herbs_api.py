@@ -96,6 +96,7 @@ def _critical_section_share_models(model_list):
             share_models.append(model_list)
         print("model ID " + str(model_list['model_id']) + " is created.")
         print(f"Process {os.getpid()} is leaving the critical section. (PID: {os.getpid()})")
+    return model_list['model_id']
 
 
 def _build_model(cfg):
@@ -170,18 +171,18 @@ def _get_weight_index(weight_id):
     else:
         return w_idx, weight_list[w_idx]
 
-# @app.on_event("startup")
-# async def startup_event():
+@app.on_event("startup")
+async def startup_event():
 
-#     # log_format
-#     logger = logging.getLogger("uvicorn.access")
-#     console_formatter = uvicorn.logging.ColourizedFormatter(
-#         "(Time) : {asctime} - (Pid) : {process} - (IP-Response) : {message}",
-#         style="{", use_colors=True)
-#     logger.handlers[0].setFormatter(console_formatter)
+    # log_format
+    logger = logging.getLogger("uvicorn.access")
+    console_formatter = uvicorn.logging.ColourizedFormatter(
+        "(Time) : {asctime} - (Pid) : {process} - (IP-Response) : {message}",
+        style="{", use_colors=True)
+    logger.handlers[0].setFormatter(console_formatter)
 
-#     if not os.path.exists(weight_dir):
-#         os.mkdir(weight_dir)
+    if not os.path.exists(weight_dir):
+        os.mkdir(weight_dir)
 
 
 @app.get("/weight/")
@@ -317,19 +318,18 @@ async def post_load_weight(response: Response, weight_id: int):
     Returns:
         int: error_code
     """
-    error_code = 0
+
     weight_list = _get_weight_list()
 
     if _check_weight_list(weight_list, weight_id):
         id, weight_list = _get_weight_index(weight_id)
         model, classes_names, best_cls = _load_model(str(weight_list['file_path']), weight_list)
         model_list = {"model_id" : None, "name" : str(weight_list['name']), "model" : model.to('cpu'), "classes_names" : classes_names, "best_cls_name" : best_cls }
-        _critical_section_share_models(model_list)
+        model_id = _critical_section_share_models(model_list)
     else:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return {"error_code": error_code, "error_msg": "Model is not exist."}
+        return {"error_code": 1, "error_msg": "Model is not exist."}
 
-    return {"error_code": error_code}
+    return {"error_code": 0, "model_id": model_id}
 
 @app.get("/weight/load/")
 async def get_load_weight(response: Response):
