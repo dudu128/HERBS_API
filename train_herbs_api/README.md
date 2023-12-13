@@ -25,5 +25,5 @@ e.g. http://hc7.isl.lab.nycu.edu.tw:8008/docs
 
 ## 查看logs，在terminal輸入
 ```
-docker logs  herbs_train_container
+docker logs herbs_train_container
 ```
