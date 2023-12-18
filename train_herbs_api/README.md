@@ -1,9 +1,20 @@
-## 從github clone下之後，在train_herbs_api->code->pretrained內下載pretrained weight(因為github限制超過100MB)
+## 從github clone下，到cd到train_herbs_api->code路徑  
+```
+cd /HERBS_API/train_herbs_api/code
+```
+
+## 在train_herbs_api->code，新增一個資料夾叫做pretrained
+```
+mkdir pretrained
+```
+
+## 在train_herbs_api->code->pretrained內下載pretrained weight(因為github限制超過100MB)  
 先cd到train_herbs_api->code->pretrained  
 ```
-cd /HERBS_API/train_herbs_api/code/pretrained
+cd pretrained
 ```
-在terminal輸入，會得到emb_func_best.pth  
+
+## 在terminal輸入，會得到emb_func_best.pth(pretrained weight)  
 ```
 wget --load-cookies /tmp/cookies.txt "https://drive.google.com/u/0/uc?id=1bxDjd1VZjzc1jAbi8JOmZ_AyoHBFgHpO&export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://drive.google.com/uc?export=download&id=${fileid}' -O- | sed -rn 's/.confirm=([0-9A-Za-z_]+)./\1\n/p')" -O "emb_func_best.pth" && rm -rf /tmp/cookies.txt
 ```
