@@ -19,7 +19,7 @@ cd pretrained
 wget --load-cookies /tmp/cookies.txt "https://drive.google.com/u/0/uc?id=1bxDjd1VZjzc1jAbi8JOmZ_AyoHBFgHpO&export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://drive.google.com/uc?export=download&id=${fileid}' -O- | sed -rn 's/.confirm=([0-9A-Za-z_]+)./\1\n/p')" -O "emb_func_best.pth" && rm -rf /tmp/cookies.txt
 ```
 
-## cd 回到 train_herbs_api路徑， == cd ..兩次 ==
+## cd 回到 train_herbs_api路徑，當前路徑應該是train_herbs_api->code->pretrained所以要cd ..兩次!!!
 ```
 cd ..
 ```
