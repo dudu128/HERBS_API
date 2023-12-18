@@ -1,3 +1,8 @@
+## 從github clone下，到cd到inference_herbs_api  
+```
+cd /HERBS_API/inference_herbs_api
+```
+
 ## 建立image，在terminal輸入
 ```
 docker build -t herbs_inference_image .
