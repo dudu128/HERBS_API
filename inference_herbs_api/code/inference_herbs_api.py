@@ -26,6 +26,10 @@ from multiprocessing import Process, Array, Lock, Manager
 import io
 import time
 
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 lock = Lock()
 download_dir = "./download"
 weight_dir = "./weights"
@@ -57,12 +61,13 @@ def transform_image(image):
 
 def _critical_section_updata_weight_list(weight_list_id, w):
     with lock:
-        print(f"Process {os.getpid()} is entering the critical section. (PID: {os.getpid()})")
+        # print(f"Process {os.getpid()} is entering the critical section. (PID: {os.getpid()})")
+        logger.info(f"Process {os.getpid()} is entering the critical section. (PID: {os.getpid()})")
         weight_list = _get_weight_list()
         weight_list[weight_list_id] = w
         _updata_weight_list(weight_list)
-        print("weight list updated!")
-        print(f"Process {os.getpid()} is leaving the critical section. (PID: {os.getpid()})")
+        logger.info(f"Process {os.getpid()} is leaving the critical section. (PID: {os.getpid()})")
+        # print(f"Process {os.getpid()} is leaving the critical section. (PID: {os.getpid()})")
 
 def _critical_section_weight_id():
     with lock:
@@ -84,7 +89,6 @@ def _critical_section_weight_id():
         print(f"Process {os.getpid()} is leaving the critical section. (PID: {os.getpid()})")
     return weight_list_id, w
 
-
 def _critical_section_share_models(model_list):
     with lock:
         print(f"Process {os.getpid()} is entering the critical section. (PID: {os.getpid()})")
@@ -97,7 +101,6 @@ def _critical_section_share_models(model_list):
         print("model ID " + str(model_list['model_id']) + " is created.")
         print(f"Process {os.getpid()} is leaving the critical section. (PID: {os.getpid()})")
     return model_list['model_id']
-
 
 def _build_model(cfg):
     backbone = timm.create_model('swin_base_patch4_window12_384_in22k', pretrained=True) 
@@ -126,8 +129,9 @@ def _get_weight_list():
 def _updata_weight_list(weight_list):
     with open(weight_info, mode='w') as file:
         json.dump(weight_list, file, ensure_ascii=False, indent=4)
-    print("weight list update!")
-
+    logger.info("weight list update!")
+    # print("weight list update!")
+ 
 def _load_model(w_dir, weight_info):
     config_file = os.path.join(w_dir, "config.yaml")
     with open(config_file, 'r') as stream:
@@ -198,7 +202,7 @@ async def get_weight_list(response: Response):
     weight_list = _get_weight_list()
 
     error_code = 0
-
+    logger.info("get_weight_list!")
     return {"weight_list": weight_list, "error_code": error_code}
 
 @app.post("/weight/{name}")
@@ -250,6 +254,7 @@ async def post_weight(response: Response, weight: UploadFile, name: str, info: U
     _critical_section_updata_weight_list(weight_list_id, w)
     
     error_code = 0
+    logger.info("post_weight!")
     return {"weight_id": w["weight_id"], "error_code": error_code}
 
 @app.get("/weight/{weight_id}")
@@ -305,6 +310,8 @@ async def delete_weight(response: Response, weight_id: int):
         del weight_list[w_idx]
         _updata_weight_list(weight_list)
         shutil.rmtree(os.path.join(weight_dir, str(weight_id)))
+        logger.info("delete_weight!")
+        
 
     return {"error_code": error_code}
 
@@ -371,6 +378,7 @@ async def delete_load_weight(response: Response, model_id: int):
         process_model = share_models[:]
         print(len(process_model))
         torch.cuda.empty_cache()
+        logger.info("delete_load_weight!")
         return {"error_code": 0}
     else:
         return {"error_code": 1, "error_code": "Model is not loaded in the memory."}
@@ -433,6 +441,7 @@ async def Inference(response: Response, file: UploadFile, model_id: int, device:
     img.unsqueeze_(0)
     imgs = img.to(device)
     preds, scores = _inference(imgs, model, best_cls)
+    logger.info("Inference Finished!")
     return {"input": filename, "predict label": int(preds[0]), "predict class name": classes_name[preds[0]], "error_code": 0}
 
 @app.post("/inference/batch")
@@ -510,9 +519,12 @@ async def Inference_Batch(response: Response, file: UploadFile, model_id: int, d
             preds[i]), "predict class name": classes_name[preds[i]]})
     result.append({"error_code": 0})
     inference_end = time.time()
-    print("copy time : ", (copy_end - inference_start))
-    print("inference time : ", (inference_end - inference_start))
+    # print("copy time : ", (copy_end - inference_start))
+    # print("inference time : ", (inference_end - inference_start))
+    logger.info("copy time : ", (copy_end - inference_start))
+    logger.info("inference time : ", (inference_end - inference_start))
+    logger.info("Inference_Batch Finished!")
     return result
 
 if __name__ == "__main__":
-    print("Fast API Activate !!!")
+    logger.info("Fast API Activate !!!")
