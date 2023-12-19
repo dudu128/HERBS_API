@@ -9,7 +9,7 @@
     ├── inference_herbs_api  
     │   ├── code  
     │   │   ├── some python files  
-    │   │   ├── some logs  
+    │   │   ├── other files  
     │   │   └── ...  
     │   │  
     │   ├── Dockerfile  
@@ -22,7 +22,7 @@
     ├── train_herbs_api  
     │   ├── code  
     │   │   ├── some python files  
-    │   │   ├── some logs  
+    │   │   ├── other files  
     │   │   ├── pretrained(在train_herbs_api README說的路徑)  
     │   │   └── ...  
     │   │  
