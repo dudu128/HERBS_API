@@ -5,6 +5,7 @@ import torch.nn.functional as F
 # import pandas as pd
 from sklearn.metrics import confusion_matrix, classification_report, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
+from utils.costom_logger import timeLogger
 import csv
 import yaml
 # from math import sqrt
@@ -20,6 +21,7 @@ for times in range(0,9):
     true.append([])
     predds.append([])
 cls_cm_index = 0
+tlogger = timeLogger()
 
 # make Confusion Matrix and classification report
 def Confusion_Matrix(true, predds):
@@ -36,8 +38,8 @@ def Confusion_Matrix(true, predds):
     disp.plot(ax = ax,cmap = plt.cm.Blues,values_format = 'g')
     plt.xticks(rotation=+60)
     plt.savefig("./result/CM.jpg")
-    print(true)
-    print(predds)
+    tlogger.print(true)
+    tlogger.print(predds)
 
 def suppression(target: torch.Tensor, threshold: torch.Tensor, temperature: float = 2):
     """
@@ -119,8 +121,6 @@ def cal_train_metrics(args, msg: dict, outs: dict, labels: torch.Tensor, batch_s
 
     msg["train_loss/total_loss"] = total_loss
 
-
-
 @torch.no_grad()
 def top_k_corrects(preds: torch.Tensor, labels: torch.Tensor, tops: list = [1, 3, 5]):
     """
@@ -139,8 +139,8 @@ def top_k_corrects(preds: torch.Tensor, labels: torch.Tensor, tops: list = [1, 3
         # records
         if "top-"+str(number + 1) in corrects:
             corrects["top-"+str(number + 1)] = tmp_cor
+    tlogger.print("Finish top_k_corrects!")
     return corrects
-
 
 @torch.no_grad()
 def _cal_evalute_metric(corrects: dict,
@@ -176,6 +176,7 @@ def _cal_evalute_metric(corrects: dict,
         score_names.append(this_name)
 
     cls_cm_index += 1
+    tlogger.print("Finish cal_evalute_metric!")
 
 @torch.no_grad()
 def _average_top_k_result(corrects: dict, total_samples: dict, scores: list, labels: torch.Tensor,
