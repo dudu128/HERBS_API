@@ -115,7 +115,7 @@ if __name__ == "__main__":
     model.cuda()
     img_loader = ImgLoader(img_size = args.data_size)
     
-    args.train_root = None
+    args.train_file = None
     train_loader,val_loader = build_loader(args)
     best_top1, best_top1_name, eval_acces = evaluate(args, model, val_loader)
     print('best_top1' , best_top1)

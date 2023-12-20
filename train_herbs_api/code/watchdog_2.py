@@ -50,9 +50,6 @@ class FileEventHandler(FileSystemEventHandler):
                 job_list = json.load(file)
             j_idx = next((i for i in range(len(job_list)) if job_list[i]['job_id'] == self.j_id), None)
             
-            # with open("./testjobs/testjob.json", mode='r') as file:
-            #     testjob_list = json.load(file)
-            # tj_idx = next((i for i in range(len(testjob_list)) if testjob_list[i]['testjob_id'] == int(self.tj_id)), None)
             
             job_list[j_idx]['status'] = "Finished"
 
@@ -108,7 +105,7 @@ def complete_train_function(job_list, job_id):
 
 def complete_test_function(testjob_id):
     
-    testjob_path = os.path.join("./testjobs", str(testjob_id))
+    testjob_path = os.path.join("./test_jobs", str(testjob_id))
     # move the models
     resultCP_path = os.path.join("./result", "classification_report.csv")
     shutil.copy2(resultCP_path, testjob_path)
@@ -117,9 +114,9 @@ def complete_test_function(testjob_id):
     shutil.copy2(resultCM_path, testjob_path)
     
     # remove test set
-    data_list = os.listdir("./testdatas")
+    data_list = os.listdir("./test_image")
     for f in data_list:
-        file_path = os.path.join("./testdatas", f)
+        file_path = os.path.join("./test_image", f)
         if os.path.isdir(file_path):
         # 如果是目錄，使用 shutil.rmtree 刪除整個目錄
             shutil.rmtree(file_path)

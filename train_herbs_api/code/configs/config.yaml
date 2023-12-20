@@ -1,6 +1,6 @@
 exp_name: test
-train_root: ./datas/train.csv
-val_root: ./datas/val.csv
+train_file: ./image/train.csv
+val_file: ./image/val.csv
 image_root: ''
 randomsampler: false
 randomsampler_num: 200

@@ -13,27 +13,27 @@ with open("./configs/config.yaml", "r", encoding = "utf8") as stream:
 
 def build_loader(args):
     train_set, train_loader = None, None
-    if args.train_root is not None:
-        train_set = ImageDataset(istrain=True, root=args.train_root, data_size=args.data_size, return_index=True)
+    if args.train_file is not None:
+        train_set = ImageDataset(istrain=True, root=args.train_file, data_size=args.data_size, return_index=True)
         train_loader = torch.utils.data.DataLoader(train_set, num_workers=args.num_workers, shuffle=True, batch_size=args.batch_size)
 
     val_set, val_loader = None, None
-    if args.val_root is not None:
-        val_set = ImageDataset(istrain=False, root=args.val_root, data_size=args.data_size, return_index=True)
+    if args.val_file is not None:
+        val_set = ImageDataset(istrain=False, root=args.val_file, data_size=args.data_size, return_index=True)
         val_loader = torch.utils.data.DataLoader(val_set, num_workers=1, shuffle=False, batch_size=args.batch_size)
 
     return train_loader, val_loader
 
 def random_sample(args):
     train_set, train_loader = None, None
-    if args.train_root is not None:
-        train_set = ImageDataset(istrain=True, root=args.train_root, data_size=args.data_size, return_index=True)
+    if args.train_file is not None:
+        train_set = ImageDataset(istrain=True, root=args.train_file, data_size=args.data_size, return_index=True)
         train_loader = torch.utils.data.DataLoader(train_set, num_workers=args.num_workers, shuffle=True, batch_size=args.batch_size)
     return train_loader
 
 def get_dataset(args):
-    if args.train_root is not None:
-        train_set = ImageDataset(istrain=True, root=args.train_root, data_size=args.data_size, return_index=True)
+    if args.train_file is not None:
+        train_set = ImageDataset(istrain=True, root=args.train_file, data_size=args.data_size, return_index=True)
         return train_set
     return None
 

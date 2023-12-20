@@ -24,7 +24,6 @@ import uvicorn
 import logging
 from multiprocessing import Process, Array, Lock, Manager
 import io
-import time
 
 
 logging.basicConfig(
@@ -35,9 +34,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 lock = Lock()
-download_dir = "./download"
-weight_dir = "./weights"
-weight_info = "./weights/info.json"
+weight_dir = "./weight"
+weight_info = "./weight/info.json"
 image_type = ('.png', '.jpg', '.jpeg', '.bmp')
 weight_type = ('h5', 'ckpt', 'pth', 'pt')
 
@@ -211,15 +209,15 @@ async def get_weight_list(response: Response):
 
 @app.post("/weight/{name}")
 async def post_weight(response: Response, weight: UploadFile, name: str, info: Union[str, None] = None):
-    """Received the zip file of the Weights, create weight_info, 
+    """Received the zip file of the Weight, create weight_info, 
     assign weight_id, add weight_info into record(json file),
-    store the weights into weight folder by the weight_id
+    store the weight into weight folder by the weight_id
 
     Args:
         response (Response): response
-        name (str): the name of the weights
-        info (sre): the annotation of the weights
-        weight (UploadFile): the zip file of the weights
+        name (str): the name of the weight
+        info (sre): the annotation of the weight
+        weight (UploadFile): the zip file of the weight
 
     Returns:
         list: [int: weight_id, int: error_code]
@@ -263,12 +261,12 @@ async def post_weight(response: Response, weight: UploadFile, name: str, info: U
 
 @app.get("/weight/{weight_id}")
 async def download_weight(response: Response, background_tasks: BackgroundTasks, weight_id: int):
-    """Download the zip file contains the weights
+    """Download the zip file contains the weight
 
     Args:
         response (Response): response
         background_tasks (BackgroundTasks): Do something after response
-        weight_id (int): The weights of weight_id to be downloaded
+        weight_id (int): The weight of weight_id to be downloaded
 
     Returns:
         return:
@@ -295,11 +293,11 @@ async def download_weight(response: Response, background_tasks: BackgroundTasks,
 
 @app.delete("/weight/{weight_id}")
 async def delete_weight(response: Response, weight_id: int):
-    """Delete the weights of weight_id
+    """Delete the weight of weight_id
 
     Args:
         response (Response): response
-        weight_id (int): the weights of weight_id to be deleted
+        weight_id (int): the weight of weight_id to be deleted
 
     Returns:
         int: error_code
@@ -461,7 +459,7 @@ async def Inference_Batch(response: Response, file: UploadFile, model_id: int, d
         return: the prediction of the batch of images.
     """
 
-    inference_start = time.time()
+
     share_model_index = next((id for id, item in enumerate(share_models) if item["model_id"] == model_id), None)
     if share_model_index is None:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -481,7 +479,7 @@ async def Inference_Batch(response: Response, file: UploadFile, model_id: int, d
         process_model = share_models[:]
         model_index = share_model_index
         print(f"Share models is copyed. (PID: {os.getpid()})")
-    copy_end = time.time()
+
 
     if device == 'cpu':
         device = torch.device("cpu")
@@ -522,12 +520,7 @@ async def Inference_Batch(response: Response, file: UploadFile, model_id: int, d
         result.append({"input": img_names[i], "predict label": int(
             preds[i]), "predict class name": classes_name[preds[i]]})
     result.append({"error_code": 0})
-    inference_end = time.time()
-    # print("copy time : ", (copy_end - inference_start))
-    # print("inference time : ", (inference_end - inference_start))
-    logger.info("copy time : ", (copy_end - inference_start))
-    logger.info("inference time : ", (inference_end - inference_start))
-    logger.info("Inference_Batch Finished!")
+    logger.info("Inference Finished!")
     return result
 
 if __name__ == "__main__":
