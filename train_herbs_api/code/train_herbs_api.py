@@ -31,16 +31,16 @@ import subprocess
 
 lock = Lock()
 app = FastAPI()
-weight_dir = "./weights"
-weight_info = "./weights/info.json"
+weight_dir = "./weight"
+weight_info = "./weight/info.json"
 job_dir = "./jobs"
 job_info = "./jobs/job.json"
-testjob_dir = "./testjobs"
-testjob_info = "./testjobs/testjob.json"
+test_job_dir = "./test_jobs"
+test_job_info = "./test_jobs/test_job.json"
 image_type = ('.png', '.jpg', '.jpeg', '.bmp')
 weight_type = ('h5', 'ckpt', 'pth', 'pt')
-datas_dir = "./datas"
-testdatas_dir = "./testdatas"
+image_dir = "./image"
+test_image_dir = "./test_image"
 
 def _get_weight_list():
     if not os.path.isfile(weight_info):
@@ -59,10 +59,10 @@ def _get_job_list():
         return job_list
 
 def _get_testjob_list():
-    if not os.path.isfile(testjob_info):
+    if not os.path.isfile(test_job_info):
         return []
     else:
-        with open(testjob_info, mode='r') as file:
+        with open(test_job_info, mode='r') as file:
             testjob_list = json.load(file)
         return testjob_list
 
@@ -76,7 +76,7 @@ def _update_job_list(job_list):
         json.dump(job_list, file, ensure_ascii=False, indent=4)
 
 def _update_testjob_list(testjob_list):
-    with open(testjob_info, mode='w') as file:
+    with open(test_job_info, mode='w') as file:
         json.dump(testjob_list, file, ensure_ascii=False, indent=4)
         
 def _get_weight_index(weight_id):
@@ -153,15 +153,15 @@ async def get_weight_list(response: Response):
 
 @app.post("/weight/{name}")
 async def post_weight(response: Response, weight: UploadFile, name: str, info: Union[str, None] = None):
-    """Received the zip file of the Weights, create weight_info, 
+    """Received the zip file of the Weight, create weight_info, 
     assign weight_id, add weight_info into record(json file),
-    store the weights into weight folder by the weight_id
+    store the weight into weight folder by the weight_id
 
     Args:
         response (Response): response
-        name (str): the name of the weights
-        info (str): the annotation of the weights
-        weight (UploadFile): the zip file of the weights
+        name (str): the name of the weight
+        info (str): the annotation of the weight
+        weight (UploadFile): the zip file of the weight
 
     Returns:
         list: [int: weight_id, int: error_code]
@@ -206,11 +206,11 @@ async def post_weight(response: Response, weight: UploadFile, name: str, info: U
 
 @app.delete("/weight/{weight_id}")
 async def delete_weight(response: Response, weight_id: int):
-    """Delete the weights of weight_id
+    """Delete the weight of weight_id
 
     Args:
         response (Response): response
-        weight_id (int): the weights of weight_id to be deleted
+        weight_id (int): the weight of weight_id to be deleted
 
     Returns:
         int: error_code
@@ -284,10 +284,10 @@ async def post_train(response: Response,
         print("step 1. Weight management passed")
 
         # Download the dataset
-        if not os.path.exists(datas_dir):
-            os.mkdir(datas_dir)
+        if not os.path.exists(image_dir):
+            os.mkdir(image_dir)
 
-        data_zip_path = os.path.join(datas_dir, str(data.filename))
+        data_zip_path = os.path.join(image_dir, str(data.filename))
         async with aiofiles.open(data_zip_path, mode="wb") as out_file:
             content = await data.read()
             await out_file.write(content)
@@ -300,13 +300,13 @@ async def post_train(response: Response,
         
         # Extract files
         with zipfile.ZipFile(data_zip_path, mode='r') as zip_file:
-            zip_file.extractall(datas_dir)
+            zip_file.extractall(image_dir)
         
         os.remove(data_zip_path)
         classes_name = []
         dataset_list = []
         label = -1
-        for root, dirs, files in os.walk(datas_dir):
+        for root, dirs, files in os.walk(image_dir):
             for f in files:
                 if f.lower().endswith(image_type):
                     tmp = []
@@ -318,7 +318,7 @@ async def post_train(response: Response,
             if label == 0:
                 classes_name = dirs
         dataset_np = np.array(dataset_list, dtype='str')
-        dataset_csv_path = os.path.join(datas_dir, 'dataset.csv')
+        dataset_csv_path = os.path.join(image_dir, 'dataset.csv')
         np.savetxt(dataset_csv_path, dataset_np, delimiter = ',', fmt = '%s')
         dataset_csv = pd.read_csv(dataset_csv_path, header = None)
         x = dataset_csv.iloc[:, :-1]  # 所有行，除了最后一列之外的所有列
@@ -332,9 +332,9 @@ async def post_train(response: Response,
             
         train_data = pd.concat([x_train, y_train], axis=1)
         val_data = pd.concat([x_test, y_test], axis=1)
-        train_csv_path = os.path.join(str(datas_dir), "train.csv")
+        train_csv_path = os.path.join(str(image_dir), "train.csv")
         train_data.to_csv(train_csv_path, index = False, header = None)
-        val_csv_path = os.path.join(str(datas_dir), "val.csv")
+        val_csv_path = os.path.join(str(image_dir), "val.csv")
         val_data.to_csv(val_csv_path, index = False, header = None)
 
         print("step 2. Dataset managemet passed")
@@ -360,8 +360,8 @@ async def post_train(response: Response,
         else:
             config['pretrained'] = None
         config['image_root'] = ''
-        config['train_root'] = train_csv_path
-        config['val_root'] = val_csv_path
+        config['train_file'] = train_csv_path
+        config['val_file'] = val_csv_path
         
         with open('./configs/config.yaml', 'w') as f:
             yaml.dump(config, f, sort_keys=False)
@@ -452,9 +452,9 @@ async def delete_train(response: Response, job_id: int):
         # stop the watch_dog process
         os.killpg(os.getpgid(j["pid"]), signal.SIGTERM)
         # delete the dataset
-        data_list = os.listdir("./datas")
+        data_list = os.listdir("./image")
         for f in data_list:
-            file_path = os.path.join("./datas", f)
+            file_path = os.path.join("./image", f)
             if os.path.isdir(file_path):
             # 如果是目錄，使用 shutil.rmtree 刪除整個目錄
                 shutil.rmtree(file_path)
@@ -574,8 +574,8 @@ async def post_test(response: Response,
             json.dump(init_status, f)
 
 
-        if not os.path.exists(testjob_dir):
-            os.mkdir(testjob_dir)
+        if not os.path.exists(test_job_dir):
+            os.mkdir(test_job_dir)
 
         test_job = {"job_id": job_id, "testjob_id": None, "name": name, "info": info}
         job_idx, job_list = _get_job_index(job_id)
@@ -586,9 +586,9 @@ async def post_test(response: Response,
         print("step 1. Job managemet passed")
         
         # Download the dataset
-        if not os.path.exists(testdatas_dir):
-            os.mkdir(testdatas_dir)
-        data_zip_path = os.path.join(testdatas_dir, "testdata.zip")
+        if not os.path.exists(test_image_dir):
+            os.mkdir(test_image_dir)
+        data_zip_path = os.path.join(test_image_dir, "testdata.zip")
         async with aiofiles.open(data_zip_path, mode="wb") as out_file:
             content = await data.read()
             await out_file.write(content)
@@ -601,14 +601,14 @@ async def post_test(response: Response,
         
         # Extract files
         with zipfile.ZipFile(data_zip_path, mode='r') as zip_file:
-            zip_file.extractall(testdatas_dir)
+            zip_file.extractall(test_image_dir)
         
         os.remove(data_zip_path)
 
         # Convert image folder to csv format
         dataset_list = []
         label = -1
-        for root, dirs, files in os.walk(testdatas_dir):
+        for root, dirs, files in os.walk(test_image_dir):
             for f in files:
                 if f.lower().endswith(image_type):
                     tmp = []
@@ -618,13 +618,13 @@ async def post_test(response: Response,
                     dataset_list.append(tmp)
             label += 1
         dataset_np = np.array(dataset_list, dtype='str')
-        dataset_csv_path = os.path.join(testdatas_dir, 'dataset.csv')
+        dataset_csv_path = os.path.join(test_image_dir, 'dataset.csv')
         np.savetxt(dataset_csv_path, dataset_np, delimiter = ',', fmt = '%s')
         dataset_csv = pd.read_csv(dataset_csv_path, header = None)
         x = dataset_csv.iloc[:, :-1]
         y = dataset_csv.iloc[:, -1]
         test_data = pd.concat([x, y], axis=1)
-        testdatas_csv_path = os.path.join(str(testdatas_dir), "test.csv")
+        testdatas_csv_path = os.path.join(str(test_image_dir), "test.csv")
         test_data.to_csv(testdatas_csv_path, index = False, header = None)
         
         print("step 2. Dataset managemet passed")
@@ -650,7 +650,7 @@ async def post_test(response: Response,
         testjob_list.append(test_job)
         _update_testjob_list(testjob_list)
 
-        testjob_path = os.path.join(testjob_dir, str(test_job["testjob_id"]))
+        testjob_path = os.path.join(test_job_dir, str(test_job["testjob_id"]))
         if not os.path.exists(testjob_path):
             os.mkdir(testjob_path)
         
@@ -696,8 +696,8 @@ async def get_test(response: Response, background_tasks: BackgroundTasks, testjo
     if tj_idx is None:
         return {"error_code": 1, "error_msg": "testjob {testjob_id} is not exists"}
     else:
-        tj_dir_path = os.path.join(testjob_dir, str(testjob_id))
-        zip_path = os.path.join(testjob_dir, "{}.zip".format(str(tj["name"])))
+        tj_dir_path = os.path.join(test_job_dir, str(testjob_id))
+        zip_path = os.path.join(test_job_dir, "{}.zip".format(str(tj["name"])))
     
     if j["status"] != "Finished":
         return {"error_code": 2, "error_msg": "job {job_id} has not finished yet"}
@@ -735,7 +735,7 @@ async def delete_test(response: Response, testjob_id: int):
     else:
         del testjob_list[tj_idx]
         _update_testjob_list(testjob_list)
-        shutil.rmtree(os.path.join(testjob_dir, str(testjob_id)))
+        shutil.rmtree(os.path.join(test_job_dir, str(testjob_id)))
         return {"error_code": 0}
 
 test_url_data = []
