@@ -3,11 +3,6 @@
 cd /HERBS_API/train_herbs_api/code
 ```
 
-## 在train_herbs_api->code，新增一個資料夾叫做pretrained
-```
-mkdir pretrained
-```
-
 ## 在train_herbs_api->code->pretrained內下載pretrained weight(因為github限制超過100MB)  
 先cd到train_herbs_api->code->pretrained  
 ```
