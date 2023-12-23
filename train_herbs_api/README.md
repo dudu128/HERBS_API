@@ -26,7 +26,7 @@ docker build -t herbs_train_image .
 
 ## 建立container，在terminal輸入
 ```
-docker run -d --gpus all --name herbs_train_container -p 8008:8008 herbs_train_image
+docker run -d --gpus all --shm-size 4G --name herbs_train_container -p 8008:8008 herbs_train_image
 ```
 
 ## 在網址欄中輸入就可以進到api網頁

@@ -10,7 +10,7 @@ docker build -t herbs_inference_image .
 
 ## 建立container，在terminal輸入
 ```
-docker run -d --gpus all --name herbs_inference_container -p 8001:8001 herbs_inference_image
+docker run -d --gpus all --shm-size 4G --name herbs_inference_container -p 8001:8001 herbs_inference_image
 ```
 
 ## 在網址欄中輸入就可以進到api網頁
