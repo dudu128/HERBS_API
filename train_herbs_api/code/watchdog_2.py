@@ -86,9 +86,9 @@ def complete_train_function(job_list, job_id):
     shutil.copy2(modelcfg_path, job_path)
     
     # delete the dataset
-    data_list = os.listdir("./datas")
+    data_list = os.listdir("./image")
     for f in data_list:
-        file_path = os.path.join("./datas", f)
+        file_path = os.path.join("./image", f)
         if os.path.isdir(file_path):
         # 如果是目錄，使用 shutil.rmtree 刪除整個目錄
             shutil.rmtree(file_path)
