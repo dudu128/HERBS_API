@@ -634,7 +634,7 @@ async def post_test(response: Response,
         with open(test_model_path, 'r') as f:
             config = yaml.load(f, Loader = yaml.FullLoader)
 
-        config['val_root'] = testdatas_csv_path
+        config['val_file'] = testdatas_csv_path
 
         with open(test_model_path, 'w') as f:
             yaml.dump(config, f, sort_keys=False)
