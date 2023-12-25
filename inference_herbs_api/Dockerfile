@@ -11,4 +11,4 @@ RUN python -m pip install --upgrade pip
 RUN python -m pip install --default-timeout=300 -r /requirements.txt
 
 WORKDIR /code
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8001", "inference_herbs_api:app"]
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8001", "inference_herbs_api:app", "--timeout", "600"]
